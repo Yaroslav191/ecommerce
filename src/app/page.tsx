@@ -8,8 +8,6 @@ const Home = async () => {
       cache: "no-store",
    });
 
-   console.log(products);
-
    const banners = await client.fetch(getBaners);
 
    return (
