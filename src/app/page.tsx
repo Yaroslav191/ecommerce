@@ -1,13 +1,16 @@
-import { client } from "../../lib/client";
+import { client, urlFor } from "../../lib/client";
 import { getProducts, getBaners } from "../../utils/data";
-import { HeroBanner, Product } from "../../components";
+import { FooterBanner, HeroBanner, Product } from "../../components";
+import { ProductPropts } from "../../utils/types";
 
 const Home = async () => {
-   const products = await client.fetch(getProducts);
+   const products = await client.fetch(getProducts, {
+      cache: "no-store",
+   });
+
+   console.log(products);
 
    const banners = await client.fetch(getBaners);
-
-   console.log(banners);
 
    return (
       <div>
@@ -19,10 +22,12 @@ const Home = async () => {
          </div>
 
          <div className="products-container">
-            {products.map((item: any) => {
+            {products.map((item: ProductPropts) => {
                return <Product product={item} />;
             })}
          </div>
+
+         <FooterBanner footerBanner={banners && banners[0]} />
       </div>
    );
 };
