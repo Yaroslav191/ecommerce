@@ -12,7 +12,6 @@ const Product = ({
 }: {
    product: ProductPropts;
 }) => {
-   console.log(image);
    return (
       <div>
          <Link href={`/product/${slug?.current}`}>
