@@ -1,61 +1,79 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import Image from 'next/image';
 import { client, urlFor } from '../../../../lib/client';
 import { getProduct, getProducts } from '../../../../utils/data';
 import { AiOutlineMinus, AiOutlinePlus, AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { ProductPropts } from '../../../../utils/types';
 import { Product } from '../../../../components';
+import { Context } from '../../../../components/context/StateContext';
+
+type selectedImgType = {
+  _key: any;
+  _type: String;
+  asset: Object;
+};
 
 const page = ({ params }: { params: { slug: string } }) => {
-  const [selectedImg, setSelectedImg] = useState(false);
-  const [data, setData] = useState<any>(null);
-  // const [selectedImg, setSelectedImg] = useState(false);
+  const [selectedImg, setSelectedImg] = useState(0);
+  const [data, setData] = useState({} as ProductPropts);
+  const [products, setProducts] = useState([]);
+  const [index, setIndex] = useState(null as Number | null);
+
+  const context = useContext(Context) as any;
+
+  console.log(context);
 
   const query = getProduct(params.slug);
 
   useEffect(() => {
-    client.fetch(query).then((data) => {
-      setData(data);
-    });
-
-    const products = client.fetch(getProducts, {
-      cache: 'no-store',
+    client.fetch(query).then((fetchedData) => {
+      setData(fetchedData);
+      console.log(fetchedData);
     });
   }, []);
 
-  const showImage = () => {
-    setSelectedImg(true);
+  const showImage = (i: any) => {
+    setIndex(i);
+    setSelectedImg(i);
   };
 
   return (
     <div>
       <div className="product-detail-container">
         <div className="image-container">
-          <Image
-            src={data?.image[0] && (urlFor(data?.image[0]).url() as any)}
-            width={250}
-            height={250}
-            alt="product-image"
-            className="product-image"
-          />
+          {data && data.image ? ( // Check if data and data.image are available before rendering
+            <Image
+              src={urlFor(data.image[selectedImg]).url() as any}
+              width={250}
+              height={250}
+              alt="product-image"
+              className="product-detail-image"
+            />
+          ) : (
+            <p>Loading...</p>
+          )}
           <div className="small-images-container">
-            {data &&
-              data.image.map((item: any) => {
+            {data && data.image ? (
+              data.image.map((item: selectedImgType, i) => {
                 return (
                   <Image
-                    src={urlFor(item).url() as any}
+                    src={urlFor(item).url()}
                     width={250}
                     height={250}
+                    key={item._key}
                     alt="product-image"
-                    className={`small-image ${selectedImg ? 'selected-image' : ''}`}
-                    onMouseEnter={showImage}
+                    className={`small-image ${index === i ? 'selected-image' : ''}`}
+                    onMouseEnter={() => showImage(i)}
                     onMouseLeave={() => {
-                      setSelectedImg(false);
+                      setIndex(null);
                     }}
                   />
                 );
-              })}
+              })
+            ) : (
+              <p>Loading...</p>
+            )}
           </div>
         </div>
         <div className="product-detail-desc">
@@ -79,22 +97,28 @@ const page = ({ params }: { params: { slug: string } }) => {
           </div>
 
           <div className="quantity-desc">
-            <div className="minus" onClick="">
+            <div
+              className="minus"
+              onClick={() => {
+                context.decrementItem();
+              }}>
               <AiOutlineMinus />
             </div>
-            <div className="num" onClick="">
-              0
-            </div>
-            <div className="plus" onClick="">
+            <div className="num">{context.qty}</div>
+            <div
+              className="plus"
+              onClick={() => {
+                context.incrementItem();
+              }}>
               <AiOutlinePlus />
             </div>
           </div>
         </div>
         <div className="buttons">
-          <button type="button" className="add-to-cart" onClick="">
+          <button type="button" className="add-to-cart" onClick={() => {}}>
             Add to Card
           </button>
-          <button type="button" className="buy-now" onClick="">
+          <button type="button" className="buy-now" onClick={() => {}}>
             Buy Now
           </button>
         </div>
