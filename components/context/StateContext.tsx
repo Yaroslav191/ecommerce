@@ -23,20 +23,18 @@ export const StateContext = ({ children }: { children: ReactNode }) => {
 
   const decrementItem = () => {
     setTotalQuantities((prev) => {
-      if (prev > 1) {
-        return (prev = prev - 1);
-      } else {
-        return (prev = 0);
-      }
+      if (prev - 1 < 1) return 1;
+
+      return prev - 1;
     });
     setQty((prev) => {
-      if (prev > 1) {
-        return (prev = prev - 1);
-      } else {
-        return (prev = 0);
-      }
+      if (prev - 1 < 1) return 1;
+
+      return prev - 1;
     });
   };
+
+  const onAdd = (product, quntity) => {};
 
   return (
     <Context.Provider
