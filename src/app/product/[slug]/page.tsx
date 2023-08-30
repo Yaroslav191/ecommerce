@@ -6,7 +6,7 @@ import { getProduct, getProducts } from '../../../../utils/data';
 import { AiOutlineMinus, AiOutlinePlus, AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { ProductPropts } from '../../../../utils/types';
 import { Product } from '../../../../components';
-import { Context } from '../../../../components/context/StateContext';
+import { useStateContext } from '../../../../components/context/StateContext';
 
 type selectedImgType = {
   _key: any;
@@ -20,9 +20,7 @@ const page = ({ params }: { params: { slug: string } }) => {
   const [products, setProducts] = useState([]);
   const [index, setIndex] = useState(null as Number | null);
 
-  const context = useContext(Context) as any;
-
-  console.log(context);
+  const { decQty, incQty, qty, onAdd } = useStateContext();
 
   const query = getProduct(params.slug);
 
@@ -30,6 +28,11 @@ const page = ({ params }: { params: { slug: string } }) => {
     client.fetch(query).then((fetchedData) => {
       setData(fetchedData);
       console.log(fetchedData);
+    });
+
+    client.fetch(getProducts).then((fetchedData) => {
+      setProducts(fetchedData);
+      console.log(products);
     });
   }, []);
 
@@ -100,22 +103,22 @@ const page = ({ params }: { params: { slug: string } }) => {
             <div
               className="minus"
               onClick={() => {
-                context.decrementItem();
+                decQty();
               }}>
               <AiOutlineMinus />
             </div>
-            <div className="num">{context.qty}</div>
+            <div className="num">{qty}</div>
             <div
               className="plus"
               onClick={() => {
-                context.incrementItem();
+                incQty();
               }}>
               <AiOutlinePlus />
             </div>
           </div>
         </div>
         <div className="buttons">
-          <button type="button" className="add-to-cart" onClick={() => {}}>
+          <button type="button" className="add-to-cart" onClick={() => onAdd(data, qty)}>
             Add to Card
           </button>
           <button type="button" className="buy-now" onClick={() => {}}>

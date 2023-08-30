@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Header, Footer } from '../../components';
 import { StateContext } from '../../components/context/StateContext';
-import { toast } from 'ract-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -14,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <StateContext>
+          <Toaster />
           <Header />
           <main className="main-container">{children}</main>
           <Footer />
